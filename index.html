@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/NigPopulationstates_1.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[3.9107244099914578,-1.968973804288356],[14.47111408297551,19.914573413451947]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_OSMStandard_0');
+        map.getPane('pane_OSMStandard_0').style.zIndex = 400;
+        var layer_OSMStandard_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OSMStandard_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OSMStandard_0;
+        map.addLayer(layer_OSMStandard_0);
+        function pop_NigPopulationstates_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">State ID</th>\
+                        <td>' + (feature.properties['ID_1'] !== null ? autolinker.link(feature.properties['ID_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">STATE</th>\
+                        <td>' + (feature.properties['NAME_1'] !== null ? autolinker.link(feature.properties['NAME_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">POPULATION</th>\
+                        <td>' + (feature.properties['Population_sum'] !== null ? autolinker.link(feature.properties['Population_sum'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_NigPopulationstates_1_0(feature) {
+            if (feature.properties['Population_sum'] >= 2000000.000000 && feature.properties['Population_sum'] <= 4500000.000000 ) {
+                return {
+                pane: 'pane_NigPopulationstates_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,252,245,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Population_sum'] >= 4500000.000000 && feature.properties['Population_sum'] <= 7000000.000000 ) {
+                return {
+                pane: 'pane_NigPopulationstates_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(178,224,171,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Population_sum'] >= 7000000.000000 && feature.properties['Population_sum'] <= 10000000.000000 ) {
+                return {
+                pane: 'pane_NigPopulationstates_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(61,167,90,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Population_sum'] >= 10000000.000000 && feature.properties['Population_sum'] <= 15000000.000000 ) {
+                return {
+                pane: 'pane_NigPopulationstates_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,68,27,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_NigPopulationstates_1');
+        map.getPane('pane_NigPopulationstates_1').style.zIndex = 401;
+        map.getPane('pane_NigPopulationstates_1').style['mix-blend-mode'] = 'normal';
+        var layer_NigPopulationstates_1 = new L.geoJson(json_NigPopulationstates_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_NigPopulationstates_1',
+            layerName: 'layer_NigPopulationstates_1',
+            pane: 'pane_NigPopulationstates_1',
+            onEachFeature: pop_NigPopulationstates_1,
+            style: style_NigPopulationstates_1_0,
+        });
+        bounds_group.addLayer(layer_NigPopulationstates_1);
+        map.addLayer(layer_NigPopulationstates_1);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'Nig Population states<br /><table><tr><td style="text-align: center;"><img src="legend/NigPopulationstates_1_200000045000000.png" /></td><td>2000000 - 4500000</td></tr><tr><td style="text-align: center;"><img src="legend/NigPopulationstates_1_450000070000001.png" /></td><td>4500000 - 7000000</td></tr><tr><td style="text-align: center;"><img src="legend/NigPopulationstates_1_7000000100000002.png" /></td><td>7000000 - 10000000</td></tr><tr><td style="text-align: center;"><img src="legend/NigPopulationstates_1_10000000150000003.png" /></td><td>10000000 - 15000000</td></tr></table>': layer_NigPopulationstates_1,"OSM Standard": layer_OSMStandard_0,},{collapsed:false}).addTo(map);
+        setBounds();
+        map.addControl(new L.Control.Search({
+            layer: layer_NigPopulationstates_1,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'NAME_1'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"NAME_1": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_NAME_1 = document.createElement('div');
+            div_NAME_1.id = "div_NAME_1";
+            div_NAME_1.className= "filterselect";
+            document.getElementById("menu").appendChild(div_NAME_1);
+            sel_NAME_1 = document.createElement('select');
+            sel_NAME_1.multiple = true;
+            sel_NAME_1.size = 10;
+            sel_NAME_1.id = "sel_NAME_1";
+            var NAME_1_options_str = "<option value='' unselected></option>";
+            sel_NAME_1.onchange = function(){filterFunc()};
+            NAME_1_options_str  += '<option value="Abia">Abia</option>';
+            NAME_1_options_str  += '<option value="Adamawa">Adamawa</option>';
+            NAME_1_options_str  += '<option value="Akwa Ibom">Akwa Ibom</option>';
+            NAME_1_options_str  += '<option value="Anambra">Anambra</option>';
+            NAME_1_options_str  += '<option value="Bauchi">Bauchi</option>';
+            NAME_1_options_str  += '<option value="Bayelsa">Bayelsa</option>';
+            NAME_1_options_str  += '<option value="Benue">Benue</option>';
+            NAME_1_options_str  += '<option value="Borno">Borno</option>';
+            NAME_1_options_str  += '<option value="Cross River">Cross River</option>';
+            NAME_1_options_str  += '<option value="Delta">Delta</option>';
+            NAME_1_options_str  += '<option value="Ebonyi">Ebonyi</option>';
+            NAME_1_options_str  += '<option value="Edo">Edo</option>';
+            NAME_1_options_str  += '<option value="Ekiti">Ekiti</option>';
+            NAME_1_options_str  += '<option value="Enugu">Enugu</option>';
+            NAME_1_options_str  += '<option value="Federal Capital Territory">Federal Capital Territory</option>';
+            NAME_1_options_str  += '<option value="Gombe">Gombe</option>';
+            NAME_1_options_str  += '<option value="Imo">Imo</option>';
+            NAME_1_options_str  += '<option value="Jigawa">Jigawa</option>';
+            NAME_1_options_str  += '<option value="Kaduna">Kaduna</option>';
+            NAME_1_options_str  += '<option value="Kano">Kano</option>';
+            NAME_1_options_str  += '<option value="Katsina">Katsina</option>';
+            NAME_1_options_str  += '<option value="Kebbi">Kebbi</option>';
+            NAME_1_options_str  += '<option value="Kogi">Kogi</option>';
+            NAME_1_options_str  += '<option value="Kwara">Kwara</option>';
+            NAME_1_options_str  += '<option value="Lagos">Lagos</option>';
+            NAME_1_options_str  += '<option value="Nassarawa">Nassarawa</option>';
+            NAME_1_options_str  += '<option value="Niger">Niger</option>';
+            NAME_1_options_str  += '<option value="Ogun">Ogun</option>';
+            NAME_1_options_str  += '<option value="Ondo">Ondo</option>';
+            NAME_1_options_str  += '<option value="Osun">Osun</option>';
+            NAME_1_options_str  += '<option value="Oyo">Oyo</option>';
+            NAME_1_options_str  += '<option value="Plateau">Plateau</option>';
+            NAME_1_options_str  += '<option value="Rivers">Rivers</option>';
+            NAME_1_options_str  += '<option value="Sokoto">Sokoto</option>';
+            NAME_1_options_str  += '<option value="Taraba">Taraba</option>';
+            NAME_1_options_str  += '<option value="Water body">Water body</option>';
+            NAME_1_options_str  += '<option value="Yobe">Yobe</option>';
+            NAME_1_options_str  += '<option value="Zamfara">Zamfara</option>';
+            sel_NAME_1.innerHTML = NAME_1_options_str;
+            div_NAME_1.appendChild(sel_NAME_1);
+            var lab_NAME_1 = document.createElement('div');
+            lab_NAME_1.innerHTML = 'NAME_1';
+            lab_NAME_1.className = 'filterlabel';
+            div_NAME_1.appendChild(lab_NAME_1);
+            var reset_NAME_1 = document.createElement('div');
+            reset_NAME_1.innerHTML = 'clear filter';
+            reset_NAME_1.className = 'filterlabel';
+            reset_NAME_1.onclick = function() {
+                var options = document.getElementById("sel_NAME_1").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_NAME_1.appendChild(reset_NAME_1);
+        </script>
+    </body>
+</html>
